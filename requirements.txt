@@ -1,1 +1,3 @@
 Flask==0.9
+Mongoengine==0.7.5
+unidecode

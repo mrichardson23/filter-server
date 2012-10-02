@@ -1,7 +1,5 @@
 {% extends "layout/main.html" %}
 
-{% block styles %}
-{% endblock %}
 
 {% block body %}
 
@@ -9,9 +7,49 @@
 
 	<!-- left column -->
 	<div class="span6">
-		<h3>Hello World</h3>
+		<h3>Ideas</h3>
+		
+		{% for idea in ideas %}
+			<h4><a href="/ideas/{{ idea.slug }}">{{ idea.title }}</a></h4>
+			<p>by {{ idea.creator }}</p>
+			<p>
+			{% for cat in idea.categories %}
+				<span class="label label-inverse"><a href="/category/{{ cat}}">{{ cat|replace("_"," ")}}</a></span>
+			{% endfor %}
+			<hr/>
+		{% endfor %}
+		
+	</div>
+
+	<div class="span6">
 		
 		
+		<form method="POST" action="/ideas/add">
+			<legend><h3>Share Your Ideas</h3></legend>
+
+			<label for="creator">First Name</label>
+			<input type="text" id="creator" name="creator">
+			
+			<label for="title">Project Title</label>
+			<input type="text" id="title" name="title">
+
+			<label for="idea">Project Title</label>
+			<textarea cols="50" rows="6" id="idea" name="idea"></textarea>
+			
+			<br>
+			<label>Category</label>
+			<span class="help-block">Select as many as you need.</span>
+
+			{# comment - loop through categories and create checkboxes #}
+			{% for c in categories|sort %}
+			<label class="checkbox">
+			<input type="checkbox" name="categories" value="{{ c|replace(" ","_") }}"> {{ c|title }}
+			</label>
+			{% endfor %}
+
+
+			<button type="submit" class="btn btn-primary">Add Idea</button>
+		</form>
 	</div>
 
 	
@@ -21,4 +59,5 @@
 {% endblock %}
 
 
+{% block styles %}{% endblock %}
 {% block scripts %}{% endblock %}
