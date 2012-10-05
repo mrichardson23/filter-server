@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from mongoengine import *
+
+from flask.ext.mongoengine.wtf import model_form
 from datetime import datetime
 
 class Log(Document):
@@ -13,7 +15,7 @@ class Comment(EmbeddedDocument):
 
 class Idea(Document):
 
-	creator = StringField(max_length=120, required=True)
+	creator = StringField(max_length=120, required=True, verbose_name="First name", help_text="Please enter your first name")
 	title = StringField(max_length=120, required=True)
 	slug = StringField()
 	idea = StringField(required=True)
@@ -26,5 +28,8 @@ class Idea(Document):
 
 	# Timestamp will record the date and time idea was created.
 	timestamp = DateTimeField(default=datetime.now())
+
+IdeaForm = model_form(Idea)
+
 	
 

@@ -7,17 +7,19 @@ from unidecode import unidecode
 from flask import Flask, request, render_template, redirect, abort
 
 # import all of mongoengine
-from mongoengine import *
+# from mongoengine import *
+from flask.ext.mongoengine import mongoengine
 
 # import data models
 import models
 
 app = Flask(__name__)   # create our flask app
+app.config['CSRF_ENABLED'] = False
 
 # --------- Database Connection ---------
 # MongoDB connection to MongoLab's database
-connect('mydata', host=os.environ.get('MONGOLAB_URI'))
-print "Connecting to MongoLabs"
+mongoengine.connect('mydata', host=os.environ.get('MONGOLAB_URI'))
+app.logger.debug("Connecting to MongoLabs")
 
 
 categories = ['web','physical computing','software','video','music','installation','assistive technology','developing nations','business','social networks']
@@ -25,24 +27,36 @@ categories = ['web','physical computing','software','video','music','installatio
 # --------- Routes ----------
 
 # this is our main page
-@app.route("/")
+@app.route("/", methods=['GET','POST'])
 def index():
 
-	log = models.Log()
-	log.text = "Yo yo"
-	log.save()
+	# get Idea form from models.py
+	idea_form = models.IdeaForm(request.form)
+	
+	if request.method == "POST" and idea_form.validate():
+	
+		# get form data - create new idea
+		idea = models.Idea()
+		idea.creator = request.form.get('creator','anonymous')
+		idea.title = request.form.get('title','no title')
+		idea.slug = slugify(idea.title + " " + idea.creator)
+		idea.idea = request.form.get('idea','')
+		idea.categories = request.form.getlist('categories')
+		
+		idea.save()
 
-	#get all logs ALWAYS A LIST
-	myLogs = models.Log.objects()
+		return redirect('/ideas/%s' % idea.slug)
 
-	# render the template, pass in the animals dictionary refer to it as 'animals'
-	templateData = {
-		'ideas' : models.Idea.objects(),
-		'categories' : categories,
-		'logs' : myLogs
-	}
+	else:
 
-	return render_template("main.html", **templateData)
+		# render the template, pass in the animals dictionary refer to it as 'animals'
+		templateData = {
+			'ideas' : models.Idea.objects(),
+			'categories' : categories,
+			'form' : idea_form
+		}
+
+		return render_template("main.html", **templateData)
 
 @app.route("/category/<cat_name>")
 def by_category(cat_name):
@@ -63,25 +77,7 @@ def by_category(cat_name):
 
 	return render_template('category_listing.html', **templateData)
 
-@app.route("/ideas/add", methods=["POST"])
-def newidea():
-	
-	app.logger.debug('idea form response data')
-	app.logger.debug(request.form)
-	app.logger.debug('list of submitted categories')
-	app.logger.debug(request.form.getlist('categories'))
 
-	# get form data - create new idea
-	idea = models.Idea()
-	idea.creator = request.form.get('creator','anonymous')
-	idea.title = request.form.get('title','no title')
-	idea.slug = slugify(idea.title + " " + idea.creator)
-	idea.idea = request.form.get('idea','')
-	idea.categories = request.form.getlist('categories')
-	
-	idea.save()
-
-	return redirect('/ideas/%s' % idea.slug)
 
 @app.route("/ideas/<idea_slug>")
 def idea_display(idea_slug):

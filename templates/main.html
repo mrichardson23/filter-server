@@ -25,11 +25,25 @@
 	<div class="span6">
 		
 		
-		<form method="POST" action="/ideas/add">
+		{% if form.errors %}
+		    <ul class="errors">
+		        {% for field_name, field_errors in form.errors|dictsort if field_errors %}
+		            {% for error in field_errors %}
+		                <li>{{ form[field_name].label }}: {{ error }}</li>
+		            {% endfor %}
+		        {% endfor %}
+		    </ul>
+		{% endif %}
+
+		<form method="POST" action="/">
 			<legend><h3>Share Your Ideas</h3></legend>
 
+			{{ form.creator.label }}
+			{{ form.creator }}
+			<!--
 			<label for="creator">First Name</label>
-			<input type="text" id="creator" name="creator">
+			<input type="text" id="creator" name="creator" value="{{ form.creator }}">
+			-->
 			
 			<label for="title">Project Title</label>
 			<input type="text" id="title" name="title">
