@@ -49,7 +49,7 @@ def index():
 
 	else:
 
-		# render the template, pass in the animals dictionary refer to it as 'animals'
+		# render the template
 		templateData = {
 			'ideas' : models.Idea.objects(),
 			'categories' : categories,
