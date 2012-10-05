@@ -27,11 +27,21 @@ categories = ['web','physical computing','software','video','music','installatio
 # this is our main page
 @app.route("/")
 def index():
+
+	log = models.Log()
+	log.text = "Yo yo"
+	log.save()
+
+	#get all logs ALWAYS A LIST
+	myLogs = models.Log.objects()
+
 	# render the template, pass in the animals dictionary refer to it as 'animals'
 	templateData = {
 		'ideas' : models.Idea.objects(),
-		'categories' : categories
+		'categories' : categories,
+		'logs' : myLogs
 	}
+
 	return render_template("main.html", **templateData)
 
 @app.route("/category/<cat_name>")
@@ -116,6 +126,8 @@ def idea_comment(idea_id):
 	
 	# append comment to idea
 	idea.comments.append(comment)
+
+	# save it
 	idea.save()
 
 	return redirect('/ideas/%s' % idea.slug)
