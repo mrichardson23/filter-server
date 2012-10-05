@@ -1,3 +1,4 @@
+{% from "_form_helpers.html" import render_error, render_textarea %}
 {% extends "layout/main.html" %}
 
 
@@ -24,41 +25,39 @@
 
 	<div class="span6">
 		
-		
-		{% if form.errors %}
-		    <ul class="errors">
-		        {% for field_name, field_errors in form.errors|dictsort if field_errors %}
-		            {% for error in field_errors %}
-		                <li>{{ form[field_name].label }}: {{ error }}</li>
-		            {% endfor %}
-		        {% endfor %}
-		    </ul>
-		{% endif %}
 
 		<form method="POST" action="/">
 			<legend><h3>Share Your Ideas</h3></legend>
 
-			{{ form.creator.label }}
-			{{ form.creator }}
+			{{ form.creator.label(class='myLabelCssClass') }}
+			{{ form.creator(class='myTextboxCssClass', type='textarea') }}
+			{{ render_error(form.creator) }}  {# render_error inside _form_helpers.html #}
 			<!--
 			<label for="creator">First Name</label>
 			<input type="text" id="creator" name="creator" value="{{ form.creator }}">
 			-->
 			
+			{{ form.title.label(class='myLabelCssClass') }}
+			{{ form.title(class='myTextboxCssClass', type='textarea') }}
+			{{ render_error(form.title) }}  {# render_error inside _form_helpers.html #}
+			<!--
 			<label for="title">Project Title</label>
 			<input type="text" id="title" name="title">
+			-->
+			{{ form.idea.label }}
+			{{ render_textarea(form.idea, cols="50", rows="6") }} {# render_textarea inside _form_helpers.html #}
+			{{ render_error(form.idea) }} {# render_error inside _form_helpers.html #}
 
-			<label for="idea">Project Title</label>
-			<textarea cols="50" rows="6" id="idea" name="idea"></textarea>
 			
 			<br>
 			<label>Category</label>
 			<span class="help-block">Select as many as you need.</span>
 
+			
 			{# comment - loop through categories and create checkboxes #}
 			{% for c in categories|sort %}
 			<label class="checkbox">
-			<input type="checkbox" name="categories" value="{{ c|replace(" ","_") }}"> {{ c|title }}
+			<input type="checkbox" name="categories" value="{{ c|replace(" ","_") }}" {% if c|replace(" ","_") in form.categories.data %}checked=checked{% endif %} > {{ c|title }}
 			</label>
 			{% endfor %}
 

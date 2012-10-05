@@ -18,7 +18,7 @@ class Idea(Document):
 	creator = StringField(max_length=120, required=True, verbose_name="First name", help_text="Please enter your first name")
 	title = StringField(max_length=120, required=True)
 	slug = StringField()
-	idea = StringField(required=True)
+	idea = StringField(required=True, verbose_name="What is your idea?")
 
 	# Category is a list of Strings
 	categories = ListField(StringField(max_length=30))

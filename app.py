@@ -30,6 +30,8 @@ categories = ['web','physical computing','software','video','music','installatio
 @app.route("/", methods=['GET','POST'])
 def index():
 
+	app.logger.debug(request.form.getlist('categories'))
+
 	# get Idea form from models.py
 	idea_form = models.IdeaForm(request.form)
 	
@@ -48,6 +50,10 @@ def index():
 		return redirect('/ideas/%s' % idea.slug)
 
 	else:
+
+		if request.form.getlist('categories'):
+			for c in request.form.getlist('categories'):
+				idea_form.categories.append_entry(c)
 
 		# render the template
 		templateData = {
