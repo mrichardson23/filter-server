@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import os, datetime
 import re
 from unidecode import unidecode
@@ -7,8 +6,7 @@ from unidecode import unidecode
 from flask import Flask, request, render_template, redirect, abort
 
 # import all of mongoengine
-# from mongoengine import *
-from flask.ext.mongoengine import mongoengine
+from mongoengine import *
 
 # import data models
 import models
@@ -18,10 +16,10 @@ app.config['CSRF_ENABLED'] = False
 
 # --------- Database Connection ---------
 # MongoDB connection to MongoLab's database
-mongoengine.connect('mydata', host=os.environ.get('MONGOLAB_URI'))
+connect('mydata', host=os.environ.get('MONGOLAB_URI'))
 app.logger.debug("Connecting to MongoLabs")
 
-
+# hardcoded categories for the checkboxes on the form
 categories = ['web','physical computing','software','video','music','installation','assistive technology','developing nations','business','social networks']
 
 # --------- Routes ----------
@@ -30,11 +28,10 @@ categories = ['web','physical computing','software','video','music','installatio
 @app.route("/", methods=['GET','POST'])
 def index():
 
-	app.logger.debug(request.form.getlist('categories'))
-
 	# get Idea form from models.py
 	idea_form = models.IdeaForm(request.form)
 	
+	# if form was submitted and it is valid...
 	if request.method == "POST" and idea_form.validate():
 	
 		# get form data - create new idea
@@ -43,10 +40,11 @@ def index():
 		idea.title = request.form.get('title','no title')
 		idea.slug = slugify(idea.title + " " + idea.creator)
 		idea.idea = request.form.get('idea','')
-		idea.categories = request.form.getlist('categories')
+		idea.categories = request.form.getlist('categories') # getlist will pull multiple items 'categories' into a list
 		
-		idea.save()
+		idea.save() # save it
 
+		# redirect to the new idea page
 		return redirect('/ideas/%s' % idea.slug)
 
 	else:
