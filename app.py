@@ -51,6 +51,10 @@ def index():
 
 	else:
 
+		# for form management, checkboxes are weird (in wtforms)
+		# prepare checklist items for form
+		# you'll need to take the form checkboxes submitted
+		# and idea_form.categories list needs to be populated.
 		if request.form.getlist('categories'):
 			for c in request.form.getlist('categories'):
 				idea_form.categories.append_entry(c)
@@ -64,14 +68,19 @@ def index():
 
 		return render_template("main.html", **templateData)
 
+# Display all ideas for a specific category
 @app.route("/category/<cat_name>")
 def by_category(cat_name):
 
+	# try and get ideas where cat_name is inside the categories list
 	try:
 		ideas = models.Idea.objects(categories=cat_name)
+
+	# not found, abort w/ 404 page
 	except:
 		abort(404)
 
+	# prepare data for template
 	templateData = {
 		'current_category' : {
 			'slug' : cat_name,
@@ -81,8 +90,8 @@ def by_category(cat_name):
 		'categories' : categories
 	}
 
+	# render and return template
 	return render_template('category_listing.html', **templateData)
-
 
 
 @app.route("/ideas/<idea_slug>")
@@ -101,7 +110,56 @@ def idea_display(idea_slug):
 
 	# render and return the template
 	return render_template('idea_entry.html', **templateData)
+
+@app.route("/ideas/<idea_slug>/edit", methods=['GET','POST'])
+def idea_edit(idea_slug):
+
 	
+	# try and get the Idea from the database / 404 if not found
+	try:
+		idea = models.Idea.objects.get(slug=idea_slug)
+		
+		# get Idea form from models.py
+		# if http post, populate with user submitted form data
+		# else, populate the form with the database record
+		idea_form = models.IdeaForm(request.form, obj=idea)	
+	except:
+		abort(404)
+
+
+
+
+	if request.method == "POST" and idea_form.validate():
+	
+		# get form data - create new idea
+		idea.creator = request.form.get('creator','anonymous')
+		idea.title = request.form.get('title','no title')
+		idea.idea = request.form.get('idea','')
+		idea.categories = request.form.getlist('categories')
+		
+		idea.save()
+
+		return redirect('/ideas/%s/edit' % idea.slug)
+
+	else:
+
+		# for form management, checkboxes are weird (in wtforms)
+		# prepare checklist items for form
+		# you'll need to take the form checkboxes submitted
+		# and idea_form.categories list needs to be populated.
+		if request.form.getlist('categories'):
+			for c in request.form.getlist('categories'):
+				idea_form.categories.append_entry(c)
+
+		templateData = {
+			'categories' : categories,
+			'form' : idea_form,
+			'idea' : idea
+		}
+
+		return render_template("idea_edit.html", **templateData)
+
+
 @app.route("/ideas/<idea_id>/comment", methods=['POST'])
 def idea_comment(idea_id):
 
