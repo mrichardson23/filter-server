@@ -126,18 +126,17 @@ def idea_edit(idea_slug):
 	except:
 		abort(404)
 
-
-
-
+	# was post received and was the form valid?
 	if request.method == "POST" and idea_form.validate():
 	
-		# get form data - create new idea
+		# get form data - update a few fields
+		# note we're skipping the update of slug (incase anyone has previously bookmarked)
 		idea.creator = request.form.get('creator','anonymous')
 		idea.title = request.form.get('title','no title')
 		idea.idea = request.form.get('idea','')
 		idea.categories = request.form.getlist('categories')
-		
-		idea.save()
+
+		idea.save() # save changes
 
 		return redirect('/ideas/%s/edit' % idea.slug)
 
