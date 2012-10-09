@@ -53,7 +53,7 @@ def index():
 		# prepare checklist items for form
 		# you'll need to take the form checkboxes submitted
 		# and idea_form.categories list needs to be populated.
-		if request.form.getlist('categories'):
+		if request.method=="POST" and request.form.getlist('categories'):
 			for c in request.form.getlist('categories'):
 				idea_form.categories.append_entry(c)
 
@@ -144,7 +144,7 @@ def idea_edit(idea_slug):
 		# prepare checklist items for form
 		# you'll need to take the form checkboxes submitted
 		# and idea_form.categories list needs to be populated.
-		if request.form.getlist('categories'):
+		if request.method=="POST" and request.form.getlist('categories'):
 			for c in request.form.getlist('categories'):
 				idea_form.categories.append_entry(c)
 
