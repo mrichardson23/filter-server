@@ -1,4 +1,4 @@
-{% from "_form_helpers.html" import render_textarea %}
+{% from "_form_helpers.html" import render_error, render_textarea %}
 {% extends "layout/main.html" %}
 
 
@@ -45,7 +45,7 @@
 
 			{{ form.creator.label(class='myLabelCssClass') }}
 			{{ form.creator(class='myTextboxCssClass') }}
-			
+			{{ render_error(form.creator) }}
 			<!--
 			<label for="creator">First Name</label>
 			<input type="text" id="creator" name="creator" value="{{ form.creator }}">

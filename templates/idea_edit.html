@@ -20,15 +20,15 @@
 			{% endif %}
 
 			{{ form.creator.label(class='myLabelCssClass') }}
-			{{ form.creator(class='myTextboxCssClass', type='textarea') }}
+			{{ form.creator(class='myTextboxCssClass') }}
 			
 			<!--
 			<label for="creator">First Name</label>
-			<input type="text" id="creator" name="creator" value="{{ form.creator }}">
+			<input type="text" id="creator" name="creator" value="{{ idea.creator }}">
 			-->
 			
 			{{ form.title.label(class='myLabelCssClass') }}
-			{{ form.title(class='myTextboxCssClass', type='textarea') }}
+			{{ form.title(class='myTextboxCssClass') }}
 			
 			<!--
 			<label for="title">Project Title</label>

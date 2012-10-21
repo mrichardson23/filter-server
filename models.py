@@ -13,6 +13,7 @@ class Comment(EmbeddedDocument):
 	name = StringField()
 	comment = StringField()
 	timestamp = DateTimeField(default=datetime.now())
+	counter = IntField()
 
 class Idea(Document):
 

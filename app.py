@@ -24,6 +24,13 @@ categories = ['web','physical computing','software','video','music','installatio
 
 # --------- Routes ----------
 
+@app.route("/test")
+def test():
+
+	comments = models.Idea.objects(comments__name='John').update(inc__comments__S__counter=1)
+
+	return "ok"
+	
 # this is our main page
 @app.route("/", methods=['GET','POST'])
 def index():
