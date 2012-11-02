@@ -3,6 +3,7 @@ import os, datetime
 import re
 from unidecode import unidecode
 
+
 from flask import Flask, request, render_template, redirect, abort
 
 # import all of mongoengine
@@ -10,6 +11,10 @@ from mongoengine import *
 
 # import data models
 import models
+
+# for json needs
+import json
+from flask import jsonify
 
 app = Flask(__name__)   # create our flask app
 app.config['CSRF_ENABLED'] = False
@@ -27,7 +32,26 @@ categories = ['web','physical computing','software','video','music','installatio
 @app.route("/test")
 def test():
 
-	comments = models.Idea.objects(comments__name='John').update(inc__comments__S__counter=1)
+	# Order by date
+	ideas = models.Idea.objects().order_by('-timestamp')
+
+	# order by multiple fields
+	#ideas = models.Idea.objects().order_by('title','-timestamp')
+
+	# ideas with the word 'Sneaker' in the title (case sensitive)
+	ideas = models.Idea.objects(title__contains='Sneaker')
+
+	
+
+	# Get all Ideas that John commented on
+	# we use the double underscore __ to query embedded documents
+	# Ideas where comments made by John
+	# .objects(comments__name = 'John')
+
+	# ideas = models.Idea.objects(comments__name="John")
+	for c in ideas:
+		app.logger.debug(c.title + " " + c.timestamp.strftime("%m-%d-%Y"))
+
 
 	return "ok"
 	
@@ -64,13 +88,13 @@ def index():
 			for c in request.form.getlist('categories'):
 				idea_form.categories.append_entry(c)
 
+
 		# render the template
 		templateData = {
 			'ideas' : models.Idea.objects(),
 			'categories' : categories,
 			'form' : idea_form
 		}
-
 		return render_template("main.html", **templateData)
 
 # Display all ideas for a specific category
@@ -197,6 +221,58 @@ def idea_comment(idea_id):
 	return redirect('/ideas/%s' % idea.slug)
 
 
+@app.route('/data/ideas')
+def data_ideas():
+	ideas = models.Idea.objects
+
+	if ideas:
+		public_ideas = []
+
+		#prep data for json
+		for i in ideas:
+			
+			tmpIdea = {
+				'creator' : i.creator,
+				'title' : i.title,
+				'idea' : i.idea,
+				'timestamp' : str( i.timestamp )
+			}
+
+			# comments / our embedded documents
+
+			tmpIdea['comments'] = [] # list - will hold all comment dictionaries
+			
+			# loop through idea comments
+			for c in i.comments:
+				comment_dict = {
+					'name' : c.name,
+					'comment' : c.comment,
+					'timestamp' : str( c.timestamp )
+				}
+
+				# append comment_dict to ['comments']
+				tmpIdea['comments'].append(comment_dict)
+
+			public_ideas.append( tmpIdea )
+
+		# prepare dictionary for JSON return
+		data = {
+			'status' : 'OK',
+			'ideas' : public_ideas
+		}
+
+		# jsonify (imported from Flask above)
+		# will convert 'data' dictionary and 
+		return jsonify(data)
+
+	else:
+		error = {
+			'status' : 'error',
+			'msg' : 'unable to retrieve ideas'
+		}
+		return jsonify(error)
+
+
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404
@@ -211,6 +287,7 @@ def slugify(text, delim=u'-'):
 	for word in _punct_re.split(text.lower()):
 		result.extend(unidecode(word).split())
 	return unicode(delim.join(result))
+
 
 
 # --------- Server On ----------

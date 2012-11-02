@@ -4,6 +4,8 @@ from mongoengine import *
 from flask.ext.mongoengine.wtf import model_form
 from datetime import datetime
 
+import logging
+
 # our demo model from week 5 in class
 class Log(Document):
 	text = StringField()
@@ -13,8 +15,7 @@ class Comment(EmbeddedDocument):
 	name = StringField()
 	comment = StringField()
 	timestamp = DateTimeField(default=datetime.now())
-	counter = IntField()
-
+	
 class Idea(Document):
 
 	creator = StringField(max_length=120, required=True, verbose_name="First name")
@@ -34,6 +35,4 @@ class Idea(Document):
 
 # Create a Validation Form from the Idea model
 IdeaForm = model_form(Idea)
-
-	
 
