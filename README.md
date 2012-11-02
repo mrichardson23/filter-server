@@ -35,7 +35,7 @@ We will be using MongoLabs as our MongoDB host service, they have a free starter
 
 Heroku offers a [lot of different Add-ons](https://addons.heroku.com/) for your apps. Many different types of databases, image tools, cache utilities are available from 3rd party companies. Many offer a trial plan to test and develop with before you commit to a paid plan.
 
-MongoLabs offers a [250MB MongoDB instance for free](https://addons.heroku.com/mongolab) (see here) : ) How wonderful.
+MongoLabs offers a [500MB MongoDB instance for free](https://addons.heroku.com/mongolab) (see here) : ) How wonderful.
 
 To install the MongoLabs 
 
@@ -54,7 +54,7 @@ We must create a local configuration file to allow our local development server 
 
 Run the following command inside your code folder.
 
-	heroku config --shell > .env
+	heroku config --shell | grep MONGOLAB_URI > .env
 
 This will create a new file, **.env**  and it will contain a single line starting with MONGOLAB_URI and followed by a long connection url. This is the username and password for your MongoLabs account.
 
