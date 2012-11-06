@@ -199,7 +199,7 @@ def idea_comment(idea_id):
 
 @app.route('/data/ideas')
 def data_ideas():
-	ideas = models.Idea.objects().order_by('-timestamp')
+	ideas = models.Idea.objects().order_by('+timestamp').limit(10)
 
 	if ideas:
 		public_ideas = []
