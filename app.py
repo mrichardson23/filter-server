@@ -248,6 +248,50 @@ def data_ideas():
 		}
 		return jsonify(error)
 
+@app.route('/getideas')
+def get_remote_ideas():
+
+	# ideas available via json
+	ideas_url = "http://itp-ideas-dwd.herokuapp.com/data/ideas"
+
+	# make a GET request to the url
+	idea_request = requests.get(ideas_url)
+
+	# log out what we got
+	app.logger.info(idea_request.json)
+
+	# requests will automatically convert json for us.
+	# .json will convert incoming json to Python dictionary for us
+	ideas_data = idea_request.json
+
+	# alternative way
+	# ideas_data = json.loads( idea_request.text )
+
+	# the returned json looks like
+	# {
+	# 	'status' : 'OK',
+	# 	'ideas' : [
+	# 		{
+	# 		timestamp: "2012-10-02 09:16:54.086000",
+	# 		title: "Immortality",
+	# 		idea: "Immortality is the ability to live forever, or put another way, it is an immunity from death. It is unknown whether human physical (material) immortality is an achievable condition.",
+	# 		comments: [ ],
+	# 		creator: "John"
+	# 		},
+	# 		...
+	# 	]
+	# }
+
+	if ideas_data.get('status') == "OK":
+		templateData = {
+			'ideas' : ideas_data.get('ideas') # get the ideas from the returned json
+		}
+
+		return render_template('remote_ideas.html', **templateData)
+
+	
+	else:
+		return "uhoh something went wrong - status = %s" % ideas_data.get('status')
 
 @app.errorhandler(404)
 def page_not_found(error):
