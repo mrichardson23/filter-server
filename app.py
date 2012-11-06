@@ -31,52 +31,6 @@ categories = ['web','physical computing','software','video','music','installatio
 
 # --------- Routes ----------
 
-@app.route("/fsqtest")
-def fsqtest():
-
-	# Foursquare API endpoint for Venues
-	fsq_url = "https://api.foursquare.com/v2/venues/search"
-
-	# prepare the foursquare query parameters for the Venues Search request
-	# simple example includes lat,long search
-	# we pass in our client id and secret along with 'v', a version date of API.
-	fsq_query = {
-		'll' : '40.729425,-73.993707',
-		'client_id' : os.environ.get('FOURSQUARE_CLIENT_ID'),
-		'client_secret' : os.environ.get('FOURSQUARE_CLIENT_SECRET'),
-		'v' : '20121105'
-	}
-
-	# using Requests library, make a GET request to the fsq_url
-	# pass in the fsq_query dictionary as 'params', this will build the full URL with encoding variables.
-	results = requests.get(fsq_url, params=fsq_query)
-
-	# log out the url that was request
-	app.logger.info("Requested url : %s" % results.url)
-
-	# if we receive a 200 HTTP status code, great! 
-	if results.status_code == 200:
-
-		app.logger.info("received data:")
-		app.logger.info(type(results.json))
-		
-		# get the response, venue array 
-		fsq_response = results.json # .json returns a python dictonary to us.
-		nearby_venues = fsq_response['response']['venues']
-
-		app.logger.info('nearby venues')
-		app.logger.info(nearby_venues)
-
-		# Return raw json for demonstration purposes. 
-		# You would likely use this data in your templates or database in a real app
-		return jsonify(results.json['response'])
-	
-	else:
-
-		# Foursquare API request failed somehow
-		return "uhoh, something went wrong %s" % results.json
-
-	
 # this is our main page
 @app.route("/", methods=['GET','POST'])
 def index():
