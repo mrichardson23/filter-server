@@ -46,6 +46,38 @@ def index():
 		}
 	return render_template("main.html", **templateData)
 
+@app.route("/json", methods=['GET'])
+def json():
+	terms = models.Term.objects()
+
+	if terms:
+		public_terms = []
+
+		#prep data for json
+
+		for t in terms:
+			tmpTerm = {
+				'text': t.text,
+				'action': t.action
+			}
+
+			public_terms.append(tmpTerm)
+
+		data = {
+			'status' : 'OK',
+			'ideas' : public_terms
+			}
+
+		return jsonify(data)
+
+	else:
+		error = {
+			'status' : 'error',
+			'msg' : 'unable to retrieve terms'
+		}
+		return jsonify(error)
+
+
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404
