@@ -10,4 +10,4 @@ import logging
 class Term(Document):
 	text = StringField()
 	action = StringField()
-
+	switch = IntField()

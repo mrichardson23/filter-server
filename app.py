@@ -21,6 +21,8 @@ import requests
 app = Flask(__name__)   # create our flask app
 app.config['CSRF_ENABLED'] = False
 
+numberOfSwitches = 5
+
 # --------- Database Connection ---------
 # MongoDB connection to MongoLab's database
 connect('mydata', host=os.environ.get('MONGOLAB_URI'))
@@ -36,16 +38,19 @@ def index():
 		# get form data - create new term
 		term = models.Term()
 		term.text = request.form.get('text')
-		term.action = request.form.get('action','censor')
+		term.action = request.form.get('action')
+		term.switch = request.form.get('switch')
 	
 		term.save() # save it
 
 	# render the template
 	templateData = {
-		'terms' : models.Term.objects(),
+		'filters' : models.Term.objects(),
+		'numberOfSwitches' : numberOfSwitches
 		}
 	return render_template("main.html", **templateData)
 
+# to get the json:
 @app.route("/json", methods=['GET'])
 def json():
 	terms = models.Term.objects()
@@ -77,6 +82,12 @@ def json():
 		}
 		return jsonify(error)
 
+@app.route("/delete", methods=['POST'])
+def delete():
+	toDelete = request.form.get('id')
+	term = models.Term.objects.get(id=toDelete)
+	term.delete() # save it
+	return redirect('/')
 
 @app.errorhandler(404)
 def page_not_found(error):

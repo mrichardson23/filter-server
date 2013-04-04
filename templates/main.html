@@ -8,26 +8,47 @@
 <div class="row">
 
 	<!-- left column -->
-	<div class="span6">
-		<h3>Terms</h3>
+	<div class="span4">
+		<h3>Filters</h3>
 
-		{% for term in terms %}
-			<h4>{{ term.text }}: {{term.action}}</h4>
+		{% for number in range(1, numberOfSwitches + 1) %}
+		<h4>Switch {{ number }}</h4>
+			<ul>
+			{% for filter in filters if filter.switch == number %}
+				<form method="POST" action="/delete">
+				<li>{{ filter.text }}: {{filter.action}}
+						<button type="submit" class="btn btn-mini">
+							<i class="icon-trash"></i>
+						</button>
+						<input type="hidden" id="id" name="id" value="{{ filter.id }}">
+				</li>
+				</form>
+			{% endfor %}
+			</ul>
 		{% endfor %}
+	
 	</div>
 
-	<div class="span6">
-		
-
+	<div class="span4">
 		<form method="POST" action="/">
-			<legend><h3>Add a Term</h3></legend>
+			<legend><h3>Add a Filter</h3></legend>
 
 			<label for="term">Term</label>
 			<input type="text" id="text" name="text" value="">
 
 			<label for="action">Action</label>
-			<input type="text" id="action" name="action" value="">
+			<select id="action" name="action">
+  				<option>block</option>
+  				<option>highlight</option>
+			</select>
 
+			<label for="switch">Switch</label>
+			<select id="switch" name="switch">
+			{% for number in range(1, numberOfSwitches + 1) %}
+  				<option>{{ number }}</option>
+  			{% endfor %}
+			</select>
+			<br />
 			<button type="submit" class="btn btn-primary">Add Term</button>
 		</form>
 	</div>
