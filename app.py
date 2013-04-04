@@ -65,7 +65,7 @@ def json():
 
 		data = {
 			'status' : 'OK',
-			'ideas' : public_terms
+			'terms' : public_terms
 			}
 
 		return jsonify(data)
