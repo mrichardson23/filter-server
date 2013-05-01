@@ -23,7 +23,7 @@ import requests
 app = Flask(__name__)   # create our flask app
 app.config['CSRF_ENABLED'] = False
 
-numberOfSwitches = 5
+numberOfSwitches = 6
 
 # Serial:
 SerialPorts = glob.glob('/dev/tty.usb*') + glob.glob('/dev/cu.usb*')
@@ -39,6 +39,7 @@ app.logger.debug("Connecting to MongoLabs")
 # this is our main page
 @app.route("/", methods=['GET','POST'])
 def index():
+	currentSwitch = 1
 	# if form was submitted...
 	if request.method == "POST":
 		# get form data - create new term
@@ -46,13 +47,14 @@ def index():
 		term.text = request.form.get('text')
 		term.action = request.form.get('action')
 		term.switch = request.form.get('switch')
-	
+		currentSwitch = request.form.get('switch')
 		term.save() # save it
 
 	# render the template
 	templateData = {
 		'filters' : models.Term.objects(),
-		'numberOfSwitches' : numberOfSwitches
+		'numberOfSwitches' : numberOfSwitches,
+		'currentSwitch' : currentSwitch
 		}
 	return render_template("main.html", **templateData)
 
@@ -98,12 +100,26 @@ def json():
 		}
 		return jsonify(error)
 
+@app.route("/click", methods=['GET'])
+def click():
+	ser.write('H')
+	data = {
+		'status' : 'OK'
+		}
+	return jsonify(data)
+
 @app.route("/delete", methods=['POST'])
 def delete():
+	currentSwitch = request.form.get('switch');
 	toDelete = request.form.get('id')
 	term = models.Term.objects.get(id=toDelete)
 	term.delete() # save it
-	return redirect('/')
+	templateData = {
+		'filters' : models.Term.objects(),
+		'numberOfSwitches' : numberOfSwitches,
+		'currentSwitch' : currentSwitch
+		}
+	return render_template("main.html", **templateData)
 
 @app.errorhandler(404)
 def page_not_found(error):

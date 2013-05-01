@@ -4,57 +4,62 @@
 
 {% block body %}
 
+<style>
+@font-face
+{
+font-family: embossed;
+src: url({{ url_for('static', filename='embossed.ttf') }});
+}
+</style>
+
 
 <div class="row">
-
-	<!-- left column -->
-	<div class="span4">
-		<h3>Filters</h3>
-
-		{% for number in range(1, numberOfSwitches + 1) %}
-		<h4>Switch {{ number }}</h4>
-			<ul>
-			{% for filter in filters if filter.switch == number %}
-				<form method="POST" action="/delete">
-				<li>{{ filter.text }}: {{filter.action}}
-						<button type="submit" class="btn btn-mini">
-							<i class="icon-trash"></i>
-						</button>
-						<input type="hidden" id="id" name="id" value="{{ filter.id }}">
-				</li>
-				</form>
+	<div class="span16">
+		<div class="tabbable">
+			<ul class="nav nav-tabs">
+			{% for number in range(1, numberOfSwitches + 1) %}
+				<li{% if number == currentSwitch|int %} class="active"{%endif%}><a href="#tab{{number}}" data-toggle="tab" style="font-family:embossed;">Switch{{number}}</a></li>
 			{% endfor %}
-			</ul>
-		{% endfor %}
-	
-	</div>
+   			</ul>
 
-	<div class="span4">
-		<form method="POST" action="/">
-			<legend><h3>Add a Filter</h3></legend>
+   			<div class="tab-content">
+   				{% for number in range(1, numberOfSwitches + 1) %}
+   				<div class="tab-pane{% if number == currentSwitch|int %} active{%endif%}" id="tab{{number}}">
+      				{% for filter in filters if filter.switch == number %}
+						<form method="POST" action="/delete" style="display:inline;">
+							{{ filter.text }}: {{filter.action}} <button type="submit" class="btn btn-mini" style="margin-right:15px;"><i class="icon-trash"></i></button><input type="hidden" id="id" name="id" value="{{ filter.id }}"><input type="hidden" id="switch" name="switch" value="{{ filter.switch }}">
+						</form>
+					{% endfor %}
+    			<form method="POST" action="/">
+			<legend><h4 style="font-family:embossed; margin-top:40px;">Add a Filter</h4></legend>
 
-			<label for="term">Term</label>
+			<label for="term" style="font-family:embossed;">Term</label>
 			<input type="text" id="text" name="text" value="">
 
-			<label for="action">Action</label>
-			<select id="action" name="action">
+			<label for="action" style="font-family:embossed;">Action</label>
+			<select id="action" name="action" >
   				<option>block</option>
-  				<option>highlight</option>
+  				<option>click</option>
 			</select>
-
-			<label for="switch">Switch</label>
-			<select id="switch" name="switch">
-			{% for number in range(1, numberOfSwitches + 1) %}
-  				<option>{{ number }}</option>
-  			{% endfor %}
-			</select>
+			<input type="hidden" id="switch" name="switch" value="{{ number }}">
 			<br />
-			<button type="submit" class="btn btn-primary">Add Term</button>
-		</form>
+			<button type="submit" class="btn btn-primary" style="font-family:embossed;">Add Filter</button>
+			</form>
+    			
+   			</div>
+   			{% endfor %}
+		</div>
+	</div>
+</div>
+<div class="row">
+
+	<div class="span4">
+		
 	</div>
 </div>
 
 {% endblock %}
+
 
 
 {% block styles %}{% endblock %}
